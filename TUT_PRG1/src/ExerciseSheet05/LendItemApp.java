@@ -41,7 +41,7 @@ public class LendItemApp {
 				TextIO.putf("LendItem1 and LendItem2 are %s equal.\n", LendItemFunctions.equals(it1, it2) ? "" : "not");
 				break;
 			case 9:
-				TextIO.putf("1 enter LendItem1\n" + "2 enter LendItem1\n" + "3 printLendItem1\n" + "4 printLendItem2\n"
+				TextIO.putf("1 enter LendItem1\n" + "2 enter LendItem2\n" + "3 printLendItem1\n" + "4 printLendItem2\n"
 						+ "5 compare the LendItems\n" + "0 exit\n" + "9 display this message\n");
 				break;
 			default:
