@@ -29,7 +29,7 @@ public class Waehrung {
 	}
 
 	private static void printValue(double betrag, String value) {
-		TextIO.putf("Summe %s: %.2f", value, betrag);
+		TextIO.putf("Summe %s: %.2f\n", value, betrag);
 
 	}
 
