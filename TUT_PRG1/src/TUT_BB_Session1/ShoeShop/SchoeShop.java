@@ -8,8 +8,33 @@ public class SchoeShop {
 	private static Schuhmodell[] verkaufteSchuhe = new Schuhmodell[100];
 
 	public static void main(String[] args) {
+		createDemoData();
 		buildMenu();
 
+	}
+
+	private static void createDemoData() {
+		// Produkte anlegen
+		produktkatalog[0] = new Schuhmodell();
+		produktkatalog[0].Herstellermarke = "Adidas";
+		produktkatalog[0].Modell = "Flying Shoe";
+		produktkatalog[0].Preis = 49.90F;
+		produktkatalog[1] = new Schuhmodell();
+		produktkatalog[1].Herstellermarke = "Puma";
+		produktkatalog[1].Modell = "Crouching Shoe";
+		produktkatalog[1].Preis = 79.90F;
+		produktkatalog[2] = new Schuhmodell();
+		produktkatalog[2].Herstellermarke = "Nike";
+		produktkatalog[2].Modell = "Jordan Air";
+		produktkatalog[2].Preis = 179.90F;
+
+		// Kunden anlegen
+		kundenkartei[0] = new Kunde();
+		kundenkartei[0].Name = "Bruce Lee";
+		kundenkartei[1] = new Kunde();
+		kundenkartei[1].Name = "Arnold Schwarzenegger";
+		kundenkartei[2] = new Kunde();
+		kundenkartei[2].Name = "Maria Theresa";
 	}
 
 	/**
@@ -48,6 +73,9 @@ public class SchoeShop {
 			case 5:
 				verkaufeSchuh();
 				break;
+			case 6:
+				printEinnahmen();
+				break;
 			case 0:
 				return;
 			}
@@ -55,27 +83,83 @@ public class SchoeShop {
 		}
 	}
 
+	private static void printEinnahmen() {
+		float sum = 0;
+		for (Schuhmodell schuhmodell : verkaufteSchuhe) {
+			if (schuhmodell != null) {
+				sum += schuhmodell.Preis;
+			} else {
+				break;
+			}
+		}
+		TextIO.putf("Bisherige Einnahemen: %.2f€\n", sum);
+	}
+
 	private static void verkaufeSchuh() {
-		TextIO.putf("Wähler Kunden per Id\n");
+
+		TextIO.putln();
 		printKundenkatalog();
 		int kundenId = 0;
+		boolean invalidEntry;
+		
 		do {
+			invalidEntry = false;
+			TextIO.putf("Wähler Kunden per Id\n");
 			kundenId = TextIO.getInt();
-			if(kundenId<0) {
-				kundenId=kundenkartei.length-1;
+			if (kundenId < 0 || kundenId >= kundenkartei.length) {
+				invalidEntry = true;
+				continue;
 			}
-		} while (kundenkartei[kundenId]==null);
-		TextIO.putf("Wähler Schuh per Id\n");
+		} while (invalidEntry);
+		TextIO.putln();
+
 		printSchuhKatalog();
 		int schuhId = 0;
-		do {
-			schuhId = TextIO.getInt();
-			if(schuhId<0) {
-				schuhId=produktkatalog.length-1;
-			}
-		} while (produktkatalog[schuhId]==null);
-		TextIO.putf("Kundenid: %d, Schuhid: %d\n", kundenId, schuhId);
 
+		do {
+			invalidEntry = false;
+			TextIO.putf("Wähler Schuh per Id\n");
+			schuhId = TextIO.getInt();
+			if (schuhId < 0 || schuhId >= verkaufteSchuhe.length) {
+				invalidEntry = true;
+				continue;
+			}
+		} while (invalidEntry);
+
+		// add schuh to verkaufte schuhe
+		verkaufteSchuhe = ensureCapacity(verkaufteSchuhe);
+		for (int i = 0; i < verkaufteSchuhe.length; i++) {
+			if (verkaufteSchuhe[i] == null) {
+				verkaufteSchuhe[i] = produktkatalog[schuhId];
+				TextIO.putln("Schuh den verkauften Schuhen hinzugefügt.");
+				break;
+			}
+		}
+
+		// add shoe to kunde
+		kundenkartei[kundenId].gekaufteSchuhe = ensureCapacity(kundenkartei[kundenId].gekaufteSchuhe);
+		for (int i = 0; i < kundenkartei[kundenId].gekaufteSchuhe.length; i++) {
+			if (kundenkartei[kundenId].gekaufteSchuhe[i] == null) {
+				kundenkartei[kundenId].gekaufteSchuhe[i] = produktkatalog[schuhId];
+				TextIO.putln("Schuh dem Kunden hinzugefügt.");
+				break;
+			}
+		}
+	}
+
+	private static Schuhmodell[] ensureCapacity(Schuhmodell[] array) {
+		if (array[array.length - 1] != null) {
+			return enlargeArray(array);
+		}
+		return array;
+	}
+
+	private static Schuhmodell[] enlargeArray(Schuhmodell[] array) {
+		Schuhmodell[] tempArray = new Schuhmodell[array.length + 1];
+		for (int i = 0; i < array.length; i++) {
+			tempArray[i] = array[i];
+		}
+		return tempArray;
 	}
 
 	private static void printKundenkatalog() {
