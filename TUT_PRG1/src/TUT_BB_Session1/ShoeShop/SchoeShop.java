@@ -6,6 +6,7 @@ public class SchoeShop {
 	private static Schuhmodell[] produktkatalog = new Schuhmodell[100];
 	private static Kunde[] kundenkartei = new Kunde[100];
 	private static Schuhmodell[] verkaufteSchuhe = new Schuhmodell[100];
+	private static int sortBy = 1; // standar sortiert nach SumSpent
 
 	public static void main(String[] args) {
 		createDemoData();
@@ -45,7 +46,8 @@ public class SchoeShop {
 		while (true) {
 			TextIO.putln("Operationscodes: \n" + "1 Neues Modell hinzufügen \n" + "2 Neuen Kunden hinzufügen \n"
 					+ "3 Produktkatalog anzeigen\n" + "4 Kundenkartei anzeigen \n" + "5 Schuh verkaufen \n"
-					+ "6 Bisherige Tageseinnahmen \n" + "7 Besten Kunden anzeigen \n" + "0 Programm beenden");
+					+ "6 Bisherige Tageseinnahmen \n" + "7 Besten Kunden anzeigen \n" + "8 Top 5 Kunden \n"
+					+ "9 Select sortBy \n" + "0 Programm beenden");
 			int operation = TextIO.getlnInt();
 			switch (operation) {
 			case 1:
@@ -68,7 +70,7 @@ public class SchoeShop {
 				printSchuhKatalog();
 				break;
 			case 4:
-				printKundenkatalog();
+				printKundenkatalog(kundenkartei.length);
 				break;
 			case 5:
 				verkaufeSchuh();
@@ -76,10 +78,87 @@ public class SchoeShop {
 			case 6:
 				printEinnahmen();
 				break;
+			case 7:
+				getBestCustomer();
+				break;
+			case 8:
+				getTopFive();
+				break;
+			case 9:
+				getSortBy();
+				break;
 			case 0:
 				return;
 			}
 
+		}
+	}
+
+	private static void getSortBy() {
+		do {
+			TextIO.putf("1 for sort by sum spent\n2 for sort by name\n");
+			sortBy = TextIO.getlnInt();
+		} while (sortBy < 0 && sortBy > 3);
+	}
+
+	private static void getTopFive() {
+		// Kunde[] topKundenSorted = new Kunde[kundenkartei.length];
+		if (sortBy == 1) {
+			sortBySumSpent();
+		} else {
+			sortByName();
+		}
+		printKundenkatalog(5);
+
+	}
+
+	private static void sortByName() {
+		Kunde temp;
+		for (int i = 1; i < kundenkartei.length; i++) {
+			for (int j = 0; j < kundenkartei.length - i; j++) {
+				if (kundenkartei[j] != null && kundenkartei[j + 1] != null) {
+					if (kundenkartei[j].Name.compareTo(kundenkartei[j + 1].Name) > 0) {
+						temp = kundenkartei[j];
+						kundenkartei[j] = kundenkartei[j + 1];
+						kundenkartei[j + 1] = temp;
+					}
+				}
+			}
+		}
+	}
+
+	private static void sortBySumSpent() {
+		Kunde temp;
+		for (int i = 1; i < kundenkartei.length; i++) {
+			for (int j = 0; j < kundenkartei.length - i; j++) {
+				if (kundenkartei[j] != null && kundenkartei[j + 1] != null) {
+					if (kundenkartei[j].getSumPrize() < kundenkartei[j + 1].getSumPrize()) {
+						temp = kundenkartei[j];
+						kundenkartei[j] = kundenkartei[j + 1];
+						kundenkartei[j + 1] = temp;
+					}
+				}
+			}
+		}
+	}
+
+	private static void getBestCustomer() {
+		int bestCustIdx = -1;
+		float highestSum = 0;
+		for (int i = 0; i < kundenkartei.length; i++) {
+			if (kundenkartei[i] == null) {
+				break;
+			}
+			if (highestSum < kundenkartei[i].getSumPrize()) {
+				bestCustIdx = i;
+				highestSum = kundenkartei[i].getSumPrize();
+			}
+		}
+		if (bestCustIdx > -1) {
+			TextIO.putf("Best customer is %s. He/she spent %.2f€ for shoes.\n", kundenkartei[bestCustIdx].Name,
+					highestSum);
+		} else {
+			TextIO.putf("Nobody bought shoes.\n");
 		}
 	}
 
@@ -98,10 +177,10 @@ public class SchoeShop {
 	private static void verkaufeSchuh() {
 
 		TextIO.putln();
-		printKundenkatalog();
+		printKundenkatalog(kundenkartei.length);
 		int kundenId = 0;
 		boolean invalidEntry;
-		
+
 		do {
 			invalidEntry = false;
 			TextIO.putf("Wähler Kunden per Id\n");
@@ -162,8 +241,8 @@ public class SchoeShop {
 		return tempArray;
 	}
 
-	private static void printKundenkatalog() {
-		for (int i = 0; i < kundenkartei.length; i++) {
+	private static void printKundenkatalog(int toBePrinted) {
+		for (int i = 0; i < toBePrinted; i++) {
 			if (kundenkartei[i] != null) {
 				TextIO.putf("Id: %d\tKundenname: %s\nGesamtausgaben: %.2f\n", i, kundenkartei[i].Name,
 						kundenkartei[i].getSumPrize());
